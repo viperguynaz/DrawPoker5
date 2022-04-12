@@ -22,7 +22,19 @@ namespace DrawPoker5.Entities
         public Hand Hand { get; set; }
         public int Stake { get; set; }  // contribution to pot for each hand, risk
 
-        public int Draw { get; set; }
+        public int Draw()
+        {
+            //TODO Update evaluation function
+            int draw = random.Next(1, 4);   // draw 1-3 cards randomly for now
+
+            // randomly remove draw cards
+            for (int i = 0; i < draw; i++)
+            {
+                Hand.Cards.RemoveAt(random.Next(0, Hand.Cards.Count));
+            }
+
+            return draw;
+        }
 
         public List<ActionHistory> BetHistory { get; set; }
 

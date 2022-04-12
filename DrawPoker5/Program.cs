@@ -37,8 +37,9 @@ for(int i = 0; i < numPlayers; i++)
 }
 
 // 1st bet round
-var bettingOpen = true;
+Console.WriteLine("----------- Bet 1st Round -----------");
 var roundId = Guid.NewGuid();
+var bettingOpen = true;
 var round = 1;
 var ndx = 0;
 //TODO FIX button logic
@@ -96,7 +97,18 @@ while (bettingOpen)
     }
 }
 
+// get remaining players
+var players2ndRound = players.Where(p => p.BetHistory.Last().Play.Action != Player.Actions.Fold).ToList();
+
 //TODO Draw
+Console.WriteLine("----------- Draw -----------");
+players2ndRound.ForEach(p => 
+{
+    p.Hand.Cards.AddRange(deck.Draw(p.Draw()));
+    Console.Write($"  {p.Name} ");
+    p.Hand.Cards.OrderByDescending(card => card.Rank).ToList().ForEach(card => Console.Write($"{card.Rank,2}.{card.Suit}\t"));
+    Console.Write($"{p.Hand.Rank}\r\n");
+});
 
 //TODO Bet round 2
 
