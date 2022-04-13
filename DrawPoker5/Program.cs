@@ -50,7 +50,7 @@ Console.WriteLine($"\tindex\twager\tpot\traises\tplayers\taction\tbet\tstake\tba
 
 while (bettingOpen)
 {
-    if (players[ndx].BetHistory.Count == 0 || players[ndx].BetHistory.Last().Play.Action != Player.Actions.Fold)
+    if (players[ndx].Bets.Count == 0 || players[ndx].Bets.Last().Play.Action != Player.Actions.Fold)
     {
         play = players[ndx].EvalBet(roundId, round, ndx, wager, pot, raiseCount, playerCount);
         Console.WriteLine($"\t{ndx}\t{wager}\t{pot}\t{raiseCount}\t{playerCount}\t{play.Action}\t{play.Bet}\t{players[ndx].Stake}\t{players[ndx].Bank}\t{button}");
@@ -66,7 +66,7 @@ while (bettingOpen)
                 if (ndx == button) bettingOpen = false;
                 break;
             case Player.Actions.Fold:
-                var bets = players[ndx].BetHistory.Where(b => b.RoundId == roundId).ToList();
+                var bets = players[ndx].Bets.Where(b => b.RoundId == roundId).ToList();
                 bets.ForEach(bet => bet.Score = -players[ndx].Stake);
                 playerCount--;
                 if (ndx == button) bettingOpen = false;
@@ -98,13 +98,15 @@ while (bettingOpen)
 }
 
 // get remaining players
-var players2ndRound = players.Where(p => p.BetHistory.Last().Play.Action != Player.Actions.Fold).ToList();
+var players2ndRound = players.Where(p => p.Bets.Last().Play.Action != Player.Actions.Fold).ToList();
 
 //TODO Draw
 Console.WriteLine("----------- Draw -----------");
 players2ndRound.ForEach(p => 
 {
-    p.Hand.Cards.AddRange(deck.Draw(p.Draw()));
+    var hand = p.Hand;
+    var draw = p.Draw(deck);
+
     Console.Write($"  {p.Name} ");
     p.Hand.Cards.OrderByDescending(card => card.Rank).ToList().ForEach(card => Console.Write($"{card.Rank,2}.{card.Suit}\t"));
     Console.Write($"{p.Hand.Rank}\r\n");

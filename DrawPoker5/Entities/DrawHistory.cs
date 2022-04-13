@@ -13,7 +13,7 @@ namespace DrawPoker5.Entities
         public Hand HandAfter { get; set; }
         public int CardsDrawn { get; set; }
 
-        public DrawHistory(Hand handBefore, Hand handAfter, int cardsDrawn)
+        public DrawHistory(Hand handBefore, int cardsDrawn, Hand handAfter)
         {
             HandBefore = handBefore;
             HandAfter = handAfter;

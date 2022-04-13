@@ -21,24 +21,30 @@ namespace DrawPoker5.Entities
 
         public Hand Hand { get; set; }
         public int Stake { get; set; }  // contribution to pot for each hand, risk
+        public List<ActionHistory> Bets { get; set; }
+        public List<DrawHistory> Draws { get; set; }
 
-        public int Draw()
+        private Random random = new Random();
+
+        public int Draw(Deck deck)
         {
-            //TODO Update evaluation function
-            int draw = random.Next(1, 4);   // draw 1-3 cards randomly for now
+            //TODO Update evaluation function to choose discards
+            int numToDraw = random.Next(1, 4);   // draw 1-3 cards randomly for now
+            var handBefore = Hand;
 
             // randomly remove draw cards
-            for (int i = 0; i < draw; i++)
+            for (int i = 0; i < numToDraw; i++)
             {
                 Hand.Cards.RemoveAt(random.Next(0, Hand.Cards.Count));
             }
 
-            return draw;
+            // get new cards
+            Hand.Cards.AddRange(deck.Draw(numToDraw));
+            Draws.Add(new DrawHistory(handBefore, numToDraw, Hand));
+
+            return numToDraw;
         }
 
-        public List<ActionHistory> BetHistory { get; set; }
-
-        private Random random = new Random();
         
 
         public Player(string name, List<Card> cards, int stake = 500)
@@ -47,7 +53,8 @@ namespace DrawPoker5.Entities
             Name = name;
             Bank = stake;
             Hand = new Hand(cards);
-            BetHistory = new List<ActionHistory>();
+            Bets = new List<ActionHistory>();
+            Draws = new List<DrawHistory>();
         }
 
         public PlayerAction EvalBet(Guid roundId, int round, int position, int wager, int pot, int raiseCount, int playerCount)
@@ -81,7 +88,7 @@ namespace DrawPoker5.Entities
                 PlayerCount = playerCount
             };
 
-            var similarBets = BetHistory.Where(b => b.HandRank == Hand.Rank && b.Score > 0)
+            var similarBets = Bets.Where(b => b.HandRank == Hand.Rank && b.Score > 0)
                 .OrderByDescending(b => b.Score)
                 .ToList();
 
@@ -122,7 +129,7 @@ namespace DrawPoker5.Entities
                     break;
             }
 
-            BetHistory.Add(actionHistory);
+            Bets.Add(actionHistory);
             return actionHistory.Play;
         }
     }
