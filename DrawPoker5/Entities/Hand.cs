@@ -55,7 +55,10 @@ namespace DrawPoker5.Entities
                 return rank;
             }
         }
-
+        public Hand()
+        {
+            Cards = new List<Card>();
+        }
         public Hand(List<Card> cards)
         {
             Cards = cards;

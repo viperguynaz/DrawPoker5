@@ -9,7 +9,7 @@ namespace DrawPoker5.Entities
     public class Player
     {
         public enum Actions { Check, Bet, Fold, Call, Raise }
-        public Guid Id { get; set; }
+        public Guid Id { get; }
 
         public Guid RoundId { get; set; }
         public string Name { get; set; }
@@ -18,6 +18,7 @@ namespace DrawPoker5.Entities
 
         public int Wins { get; set; }
         public int Losses { get; set; }
+        public bool IsActive { get; set; }
 
         public Hand Hand { get; set; }
         public int Stake { get; set; }  // contribution to pot for each hand, risk
@@ -25,6 +26,19 @@ namespace DrawPoker5.Entities
         public List<DrawHistory> Draws { get; set; }
 
         private Random random = new Random();
+
+        public int Ante(int ante)
+        {
+            Stake -= ante;
+            return ante;
+        }
+
+        public void PrintHand()
+        {
+            Console.Write($"  {Name} ");
+            Hand.Cards.OrderByDescending(card => card.Rank).ToList().ForEach(card => Console.Write($"{card.Rank,2}.{card.Suit}\t"));
+            Console.Write($"{Hand.Rank}\r\n");
+        }
 
         public int Draw(Deck deck)
         {
@@ -45,16 +59,20 @@ namespace DrawPoker5.Entities
             return numToDraw;
         }
 
-        
-
-        public Player(string name, List<Card> cards, int stake = 500)
+        public Player()
         {
             Id = Guid.NewGuid();
-            Name = name;
-            Bank = stake;
-            Hand = new Hand(cards);
+            Hand = new Hand();
             Bets = new List<ActionHistory>();
             Draws = new List<DrawHistory>();
+            Name = String.Empty;
+            IsActive = true;
+        }
+
+        public Player(string name, int stake = 500) : this()
+        {
+            Name = name;
+            Bank = stake;
         }
 
         public PlayerAction EvalBet(Guid roundId, int round, int position, int wager, int pot, int raiseCount, int playerCount)
@@ -123,6 +141,10 @@ namespace DrawPoker5.Entities
                     actionHistory.Play.Bet = bet;
                     Stake += wager + bet;
                     Bank -= wager + bet;
+                    break;
+                case Actions.Fold:
+                    actionHistory.Play.Bet = 0;
+                    IsActive = false;
                     break;
                 default:
                     actionHistory.Play.Bet = 0;
