@@ -28,7 +28,6 @@ namespace DrawPoker5.Entities
             get
             {
                 var cards = Cards.OrderByDescending(c => c.Rank).ToList();
-                //TODO FIX straight logic
 
                 bool straight = true;
                 for (int i = 0; i < cards.Count - 1; i++)
@@ -42,10 +41,6 @@ namespace DrawPoker5.Entities
                         straight &= cards[i].Rank - cards[i + 1].Rank == 1;
                     }
                 }
-
-
-
-
 
                 bool flush = cards.GroupBy(c => c.Suit).Count() == 1;
 

@@ -97,6 +97,33 @@ namespace DrawPoker5.Entities
             Players.Where(p => p.IsActive).ToList().ForEach(p => p.Draw(Deck));
         }
 
+        //TODO add tests and fix logic - this isn't complete
+        public Player Winner()
+        {
+            var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList();
+            if (orderedRanks.Count == 1) return orderedRanks[0];
+            if (orderedRanks[0].Hand.Rank > orderedRanks[1].Hand.Rank) return orderedRanks[0];
+
+            //var groups = cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ToList();
+
+            //if (orderedRanks[0].Hand.Cards[0].Rank > orderedRanks[1].Hand.Cards[0].Rank) return orderedRanks[0];
+            var playerCards = orderedRanks.Select(p => p.Hand.Cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ToList()).ToList();
+            if (playerCards[0].First().Key > playerCards[1].First().Key)
+            {
+                return orderedRanks[0];
+            }
+            else if (playerCards[0].First().Key < playerCards[1].First().Key)
+            {
+                return orderedRanks[1];
+            }
+            else if (playerCards[0].ElementAt(1).Key < playerCards[1].ElementAt(1).Key)
+            { 
+                return orderedRanks[1];
+            }
+
+            return orderedRanks[0];
+        }
+
         public GamePlay()
         {
             Config = new GameConfig();

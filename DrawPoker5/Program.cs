@@ -38,6 +38,8 @@ game.Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList()
     p.PrintHand();
 });
 
+Console.WriteLine($"---- WINNER is # {game.Winner().Name} ----");
+
 //TODO record scores
 
 Console.WriteLine("Press enter to quit...");
