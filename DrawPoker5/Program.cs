@@ -15,16 +15,15 @@ game.Players.ForEach(p => p.PrintHand());
 // 1st betting round
 Console.WriteLine("----------- Bet 1st Round -----------");
 PrintBetHeader();
-var button = game.PlaceBets(1, game.Config.NumPlayers);
+var button = game.PlaceBets(1, game.Config.NumPlayers - 1);
 
 
 // Draw
 Console.WriteLine("----------- Draw -----------");
+game.Draw();
 game.Players.Where(p => p.IsActive).ToList().ForEach(p => 
 {
-    Console.Write($"  {p.Name} ");
-    p.Hand.Cards.OrderByDescending(card => card.Rank).ToList().ForEach(card => Console.Write($"{card.Rank,2}.{card.Suit}\t"));
-    Console.Write($"{p.Hand.Rank}\r\n");
+    p.PrintHand();
 });
 
 // 2nd betting round
@@ -33,7 +32,11 @@ PrintBetHeader();
 game.PlaceBets(2, button);
 
 //TODO establish winner
-
+Console.WriteLine("----------- Final Hands -----------");
+game.Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList().ForEach(p =>
+{
+    p.PrintHand();
+});
 
 //TODO record scores
 

@@ -28,7 +28,25 @@ namespace DrawPoker5.Entities
             get
             {
                 var cards = Cards.OrderByDescending(c => c.Rank).ToList();
-                bool straight = ((cards.First().Rank - cards.Last().Rank) == 4) || (cards.First().Rank == 14 && cards[1].Rank == 5);
+                //TODO FIX straight logic
+
+                bool straight = true;
+                for (int i = 0; i < cards.Count - 1; i++)
+                {
+                    if (cards[i].Rank == 14 && cards[i + 1].Rank == 5)
+                    {
+                        straight &= true;
+                    }
+                    else
+                    {
+                        straight &= cards[i].Rank - cards[i + 1].Rank == 1;
+                    }
+                }
+
+
+
+
+
                 bool flush = cards.GroupBy(c => c.Suit).Count() == 1;
 
                 if (straight && flush) return cards.Last().Rank == 10 ? Ranks.RoyalFlush : Ranks.StraightFlush;
