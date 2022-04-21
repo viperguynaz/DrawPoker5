@@ -8,15 +8,31 @@ namespace DrawPoker5.Entities
 {
     public class Deck
     {
-        public List<Card> Cards { get; set; }
+        /**** Card Names, Ranks and Suits by index in a non-shuffled deck ******
+         *      Name    Rank    Clubs   Hearts  Diamonds    Spades
+         *      2	    2	    0	    13	    26	        39
+         *      3	    3	    1	    14	    27	        40
+         *      4	    4	    2	    15	    28	        41
+         *      5	    5	    3	    16	    29	        42
+         *      6	    6	    4	    17	    30	        43
+         *      7	    7	    5	    18	    31	        44
+         *      8	    8	    6	    19	    32	        45
+         *      9	    9	    7	    20	    33	        46
+         *      10	    10	    8	    21	    34	        47
+         *      Jack	11	    9	    22	    35	        48
+         *      Queen	12	    10	    23	    36	        49
+         *      King	13	    11	    24	    37	        50
+         *      Ace	    14	    12	    25	    38	        51
+        */
 
+        public List<Card> Cards { get; set; }
         public int NextCard { get; set; }
 
-        public Deck(bool shuffle = true, int ranks = 14)
+        public Deck(bool shuffle = true, int ranks = 13)
         {
             Cards = new List<Card>();
             NextCard = 0;
-            for(int rank = 2; rank <= ranks; rank++)
+            for(int rank = 2; rank < ranks+2; rank++)
             {
                 for(int suit = 0; suit < Enum.GetValues(typeof(Card.Suits)).Length; suit++)
                 {

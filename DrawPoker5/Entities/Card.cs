@@ -15,6 +15,17 @@ namespace DrawPoker5.Entities
 
         public int Value { get; set; }  // not used here
 
+        public string LongName => Rank switch
+        {
+            14 => $"Ace of {Suit}",
+            13 => $"King of {Suit}",
+            12 => $"Queen of {Suit}",
+            11 => $"Jack of {Suit}",
+             _ => $"{Rank} of {Suit}",
+        };
+
+        public string ShortName => $"{Rank,2}:{Suit.ToString().Substring(0, 1)}";
+
         public Card(int rank, Suits suit)
         {
             Rank = rank;

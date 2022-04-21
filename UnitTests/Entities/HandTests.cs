@@ -1,24 +1,26 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Linq;
 using DrawPoker5.Entities;
+using UnitTests;
 
 namespace DrawPoker5.Entities.Tests
 {
     [TestClass]
     public class HandTests
     {
+
+        //[TestInitialize]
+        //public static void InitializeTests()
+        //{
+        //    //... code that runs before each test
+        //}
+
         [TestMethod]
         public void HandTest()
         {
-            var cards = new List<Card>();
-            cards.Add(new Card(rank: 2, suit: Card.Suits.Hearts));
-            cards.Add(new Card(rank: 3, suit: Card.Suits.Hearts));
-            cards.Add(new Card(rank: 4, suit: Card.Suits.Hearts));
-            cards.Add(new Card(rank: 5, suit: Card.Suits.Hearts));
-            cards.Add(new Card(rank: 7, suit: Card.Suits.Hearts));
-
+            var cards = new List<Card>() { Cards.Hearts[0], Cards.Hearts[1], Cards.Hearts[2], Cards.Hearts[3], Cards.Hearts[5] }; // 2 3 4 5 7 of Hearts
             var hand = new Hand(cards);
-
             Assert.AreEqual(hand.Rank, Hand.Ranks.Flush);
 
             hand.Cards[4].Rank = 6;
