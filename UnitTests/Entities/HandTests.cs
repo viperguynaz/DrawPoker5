@@ -2,7 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using DrawPoker5.Entities;
 
-namespace UnitTests
+namespace DrawPoker5.Entities.Tests
 {
     [TestClass]
     public class HandTests
