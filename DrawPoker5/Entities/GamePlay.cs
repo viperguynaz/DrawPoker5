@@ -100,7 +100,7 @@ namespace DrawPoker5.Entities
         //TODO add tests and fix logic - this isn't complete
         public Player Winner()
         {
-            var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList();
+            var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ThenByDescending(p => p.Hand.Cards.).ToList();
             if (orderedRanks.Count == 1) return orderedRanks[0];
             if (orderedRanks[0].Hand.Rank > orderedRanks[1].Hand.Rank) return orderedRanks[0];
 

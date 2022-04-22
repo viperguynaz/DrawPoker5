@@ -27,13 +27,21 @@ namespace DrawPoker5.Entities.Tests
         [TestMethod]
         public void WinnerTest()
         {
-            // High Card
-            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[2], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  4C  6H  8S 10D - OnePair 8-high
-            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard 9
-
-
+            // HighCard x 2
+            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[2], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  4C  6H  8S 10D - HighCard 10
+            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard  9
             Assert.AreEqual(game.Players[0], game.Winner());
 
+            // OnePair x HighCard
+            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[0], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  2C  6H  8S 10D - OnePair(2) 10-high
+            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard 9
+            Assert.AreEqual(game.Players[0], game.Winner());
+
+            //TODO - FIX, winners, this one breaks
+            // OnePair x 2 - #1 should win
+            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[0], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  2C  6H  8S 10D - OnePair(2) 10-high
+            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[0], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[9] }; //  2S  2D  5S  7C  9H - OnePair(2) 11-high
+            Assert.AreEqual(game.Players[1], game.Winner());
         }
     }
 }
