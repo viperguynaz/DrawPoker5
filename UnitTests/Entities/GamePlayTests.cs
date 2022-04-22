@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTests;
 
 namespace DrawPoker5.Entities.Tests
 {
@@ -14,7 +15,7 @@ namespace DrawPoker5.Entities.Tests
         private static GamePlay game = new();
 
         [TestInitialize]
-        public static void InitializeTests()
+        public void InitializeTests()
         {
             // setup player 0 & 1 as the only active players to test Winner
             for (int i = 2; i < game.Config.NumPlayers; i++)
@@ -26,7 +27,13 @@ namespace DrawPoker5.Entities.Tests
         [TestMethod]
         public void WinnerTest()
         {
-            Assert.Fail();
+            // High Card
+            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[2], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  4C  6H  8S 10D - OnePair 8-high
+            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard 9
+
+
+            Assert.AreEqual(game.Players[0], game.Winner());
+
         }
     }
 }
