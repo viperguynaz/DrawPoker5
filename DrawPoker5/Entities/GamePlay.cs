@@ -17,6 +17,7 @@ namespace DrawPoker5.Entities
         public GameConfig Config { get; }
         public Deck Deck { get; set; }
         public List<Player> Players { get; set; }
+        private Random random = new Random();
 
         public void AnteUp()
         {
@@ -100,28 +101,29 @@ namespace DrawPoker5.Entities
         //TODO add tests and fix logic - this isn't complete
         public Player Winner()
         {
-            var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ThenByDescending(p => p.Hand.Cards.).ToList();
+            var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList();
             if (orderedRanks.Count == 1) return orderedRanks[0];
-            if (orderedRanks[0].Hand.Rank > orderedRanks[1].Hand.Rank) return orderedRanks[0];
+            var p1 = orderedRanks[0];
+            var p2 = orderedRanks[1];
+            if (p1.Hand.Rank > p2.Hand.Rank) return p1;
 
             //var groups = cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ToList();
 
             //if (orderedRanks[0].Hand.Cards[0].Rank > orderedRanks[1].Hand.Cards[0].Rank) return orderedRanks[0];
-            var playerCards = orderedRanks.Select(p => p.Hand.Cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ToList()).ToList();
-            if (playerCards[0].First().Key > playerCards[1].First().Key)
+            var playerCards = orderedRanks.Select(p => p.Hand.Cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ThenByDescending(g => g.Key).ToList()).ToList();
+            var c1 = playerCards[0];
+            var c2 = playerCards[1];
+
+            Player winner = null;
+            int i = 0;
+            while (i < c1.Count() && winner == null)
             {
-                return orderedRanks[0];
-            }
-            else if (playerCards[0].First().Key < playerCards[1].First().Key)
-            {
-                return orderedRanks[1];
-            }
-            else if (playerCards[0].ElementAt(1).Key < playerCards[1].ElementAt(1).Key)
-            { 
-                return orderedRanks[1];
+                if (c1[i].Key > c2[i].Key) winner = p1;
+                if (c1[i].Key < c2[i].Key) winner = p2;
+                i++;
             }
 
-            return orderedRanks[0];
+            return winner != null ? winner : random.Next(2) == 0 ? p1 : p2;
         }
 
         public GamePlay()
