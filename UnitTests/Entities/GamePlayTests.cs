@@ -17,30 +17,37 @@ namespace DrawPoker5.Entities.Tests
         [TestInitialize]
         public void InitializeTests()
         {
-            // setup player 0 & 1 as the only active players to test Winner
-            for (int i = 2; i < game.Config.NumPlayers; i++)
-            {
-                game.Players[i].IsActive = false;
-            }
+            InitCards();
+        }
+
+        private static void InitCards()
+        {
+            game.Players[0].Hand.Cards = new List<Card>() { Cards.CK,  Cards.HJ,  Cards.D9, Cards.S7, Cards.S4 };
+            game.Players[1].Hand.Cards = new List<Card>() { Cards.CQ,  Cards.H10, Cards.H9, Cards.S6, Cards.C4 };
+            game.Players[2].Hand.Cards = new List<Card>() { Cards.CJ,  Cards.S9,  Cards.H8, Cards.D7, Cards.C3 };
+            game.Players[3].Hand.Cards = new List<Card>() { Cards.C10, Cards.S8,  Cards.H7, Cards.D5, Cards.C2 };
+            game.Players[4].Hand.Cards = new List<Card>() { Cards.C9,  Cards.C6,  Cards.S5, Cards.H4, Cards.D3 };
+            game.Players[5].Hand.Cards = new List<Card>() { Cards.C8,  Cards.C7,  Cards.D6, Cards.S3, Cards.H2 };
         }
 
         [TestMethod]
         public void WinnerTest()
         {
             // HighCard x 2
-            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[2], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  4C  6H  8S 10D - HighCard 10
-            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard  9
             Assert.AreEqual(game.Players[0], game.Winner());
 
-            // OnePair x HighCard
-            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[0], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  2C  6H  8S 10D - OnePair(2) 10-high
-            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[1], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[7] }; //  2S  3D  5S  7C  9H - HighCard 9
+            // OnePair (kings) x HighCard
+            game.Players[0].Hand.Cards[1] = Cards.HK;
             Assert.AreEqual(game.Players[0], game.Winner());
 
-            // OnePair x 2 - #1 should win
-            game.Players[0].Hand.Cards = new List<Card>() { Cards.Hearts[0], Cards.Clubs[0], Cards.Hearts[4], Cards.Spades[6], Cards.Diamonds[8] }; //  2H  2C  6H  8S 10D - OnePair(2) 10-high
-            game.Players[1].Hand.Cards = new List<Card>() { Cards.Spades[0], Cards.Diamonds[0], Cards.Spades[3], Cards.Clubs[5], Cards.Hearts[9] }; //  2S  2D  5S  7C  9H - OnePair(2) 11-high
-            Assert.AreEqual(game.Players[1], game.Winner());
+            // OnePair (kings) x 2 
+            game.Players[1].Hand.Cards[0] = Cards.DK;
+            game.Players[1].Hand.Cards[1] = Cards.SK;
+            Assert.AreEqual(game.Players[0], game.Winner());
+
+            // OnePair x 2 (equal hands) & HighCard - #3 should NOT win
+            game.Players[0].Hand.Cards[3] = Cards.H6;
+            Assert.AreNotEqual(game.Players[2], game.Winner());
         }
     }
 }

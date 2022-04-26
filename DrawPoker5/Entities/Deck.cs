@@ -32,9 +32,9 @@ namespace DrawPoker5.Entities
         {
             Cards = new List<Card>();
             NextCard = 0;
-            for(int rank = 2; rank < ranks+2; rank++)
+            for (int suit = 0; suit < Enum.GetValues(typeof(Card.Suits)).Length; suit++) 
             {
-                for(int suit = 0; suit < Enum.GetValues(typeof(Card.Suits)).Length; suit++)
+                for (int rank = 2; rank < ranks + 2; rank++)
                 {
                     Cards.Add(new Card(rank, (Card.Suits) suit));
                 }
