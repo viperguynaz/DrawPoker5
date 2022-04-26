@@ -34,7 +34,7 @@ namespace DrawPoker5.Entities.Tests
         public void HighCard_Test()
         {
             // HighCard x 2
-            Assert.AreEqual(game.Players[0], game.Winner(), "HighCard #1 should win");
+            Assert.AreEqual(game.Players[0], game.Winner());
         }
 
         [TestMethod]
@@ -42,7 +42,8 @@ namespace DrawPoker5.Entities.Tests
         {
             // OnePair (kings) x HighCard
             game.Players[0].Hand.Cards[1] = Cards.HK;
-            Assert.AreEqual(game.Players[0], game.Winner(), "OnePair (kings) x HighCard #1 should win");
+
+            Assert.AreEqual(game.Players[0], game.Winner());
         }
 
         [TestMethod]
@@ -52,7 +53,8 @@ namespace DrawPoker5.Entities.Tests
             game.Players[0].Hand.Cards[1] = Cards.HK;
             game.Players[1].Hand.Cards[0] = Cards.DK;
             game.Players[1].Hand.Cards[1] = Cards.SK;
-            Assert.AreEqual(game.Players[0], game.Winner(), "OnePair_x2_HighCard #1 should win");
+
+            Assert.AreEqual(game.Players[0], game.Winner());
         }
 
         [TestMethod]
@@ -63,12 +65,11 @@ namespace DrawPoker5.Entities.Tests
             game.Players[0].Hand.Cards[3] = Cards.H6;
             game.Players[1].Hand.Cards[0] = Cards.DK;
             game.Players[1].Hand.Cards[1] = Cards.SK;
-            var msg = "OnePair x 2(equal hands) & HighCard - #1 or #2 should win (random)";
 
-            Assert.AreNotEqual(game.Players[2], game.Winner(), msg);
-            Assert.AreNotEqual(game.Players[3], game.Winner(), msg);
-            Assert.AreNotEqual(game.Players[4], game.Winner(), msg);
-            Assert.AreNotEqual(game.Players[5], game.Winner(), msg);
+            Assert.AreNotEqual(game.Players[2], game.Winner());
+            Assert.AreNotEqual(game.Players[3], game.Winner());
+            Assert.AreNotEqual(game.Players[4], game.Winner());
+            Assert.AreNotEqual(game.Players[5], game.Winner());
         }
     }
 }
