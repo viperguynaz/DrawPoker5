@@ -95,25 +95,23 @@ namespace DrawPoker5.Entities
             var actionHistory = new ActionHistory()
             {
                 RoundId = roundId,
-                HandRank = Hand.Rank,
-                Bank = Bank,
-                Stake = Stake,
-                Position = position,
                 Round = round,
+                Position = position,
                 Wager = wager,
                 Pot = pot,
                 RaiseCount = raiseCount,
-                PlayerCount = playerCount
+                PlayerCount = playerCount,
+                Hand = Hand,
             };
 
-            var similarBets = Bets.Where(b => b.HandRank == Hand.Rank && b.Score > 0)
+            var similarBets = Bets.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0)
                 .OrderByDescending(b => b.Score)
                 .ToList();
 
             // choose an action
             //TODO need a more robust evaluation function to select action
             var bet = 0;
-            if (similarBets.Count() == 0)
+            if (similarBets.Count == 0)
             {
                 actionHistory.Play.Action = wager == 0 ? (Actions)random.Next(0, 3) : (Actions)random.Next(2, 5);
                 bet = actionHistory.Play.Action == Actions.Bet || actionHistory.Play.Action == Actions.Raise ? random.Next(1, 6) : 0;
@@ -151,6 +149,8 @@ namespace DrawPoker5.Entities
                     break;
             }
 
+            actionHistory.Stake = Stake;
+            actionHistory.Bank = Bank;
             Bets.Add(actionHistory);
             return actionHistory.Play;
         }

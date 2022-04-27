@@ -31,7 +31,7 @@ Console.WriteLine("----------- Bet 2nd Round -----------");
 PrintBetHeader();
 game.PlaceBets(2, button);
 
-//TODO establish winner
+// Establish winner and print final hands
 Console.WriteLine("----------- Final Hands -----------");
 game.Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList().ForEach(p =>
 {

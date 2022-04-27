@@ -36,7 +36,6 @@ namespace DrawPoker5.Entities
 
         public int PlaceBets(int round, int button)
         {
-            //TODO fix button logic
             var roundId = Guid.NewGuid();
             var bettingOpen = true;
             Wager = 0;
@@ -46,7 +45,7 @@ namespace DrawPoker5.Entities
             {
                 if (Players[ndx].IsActive)
                 {
-                    play = Players[ndx].EvalBet(roundId, round, ndx, Wager, Pot, RaiseCount, PlayerCount);
+                    play = Players[ndx].EvalBet(roundId, round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
                     Console.WriteLine($"\t{ndx}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[ndx].Stake}\t{Players[ndx].Bank}\t{button}");
                     switch (play.Action)
                     {
@@ -107,16 +106,13 @@ namespace DrawPoker5.Entities
             var p2 = orderedRanks[1];
             if (p1.Hand.Rank > p2.Hand.Rank) return p1;
 
-            //var groups = cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ToList();
-
-            //if (orderedRanks[0].Hand.Cards[0].Rank > orderedRanks[1].Hand.Cards[0].Rank) return orderedRanks[0];
             var playerCards = orderedRanks.Select(p => p.Hand.Cards.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).ThenByDescending(g => g.Key).ToList()).ToList();
             var c1 = playerCards[0];
             var c2 = playerCards[1];
 
-            Player winner = null;
+            Player? winner = null;
             int i = 0;
-            while (i < c1.Count() && winner == null)
+            while (i < c1.Count && winner == null)
             {
                 if (c1[i].Key > c2[i].Key) winner = p1;
                 if (c1[i].Key < c2[i].Key) winner = p2;
