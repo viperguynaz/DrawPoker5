@@ -8,7 +8,7 @@ namespace DrawPoker5.Entities
 {
     public class PlayerAction
     {
-        public Player.Actions Action { get; set; }
+        public Player.Action Action { get; set; }
         public int Bet { get; set; }
     }
 }

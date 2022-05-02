@@ -2,28 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DrawPoker5.Entities
 {
     public class Player
     {
-        public enum Actions { Check, Bet, Fold, Call, Raise }
+        public enum Action { Check, Bet, Fold, Call, Raise }
         public Guid Id { get; }
-
         public Guid RoundId { get; set; }
         public string Name { get; set; }
-
         public int Bank { get; set; }
-
         public int Wins { get; set; }
         public int Losses { get; set; }
         public bool IsActive { get; set; }
-
+        [JsonIgnore] 
         public Hand Hand { get; set; }
-        public int Stake { get; set; }  // contribution to pot for each hand, risk
-        public List<ActionHistory> Bets { get; set; }
+        public int Stake { get; set; }  // contribution to pot for each hand, i.e. risk
+        public List<ActionHistory> Actions { get; set; }
         public List<DrawHistory> Draws { get; set; }
+        [JsonIgnore] 
+        public string FileName => $"data/{Id}.json";
 
         private Random random = new Random();
 
@@ -44,7 +45,7 @@ namespace DrawPoker5.Entities
         {
             //TODO Update evaluation function to choose discards
             int numToDraw = random.Next(1, 4);   // draw 1-3 cards randomly for now
-            var handBefore = Hand;
+            var handBefore = new Hand(Hand.Cards.ToList());
 
             // randomly remove draw cards
             for (int i = 0; i < numToDraw; i++)
@@ -53,7 +54,8 @@ namespace DrawPoker5.Entities
             }
 
             // get new cards
-            Hand.Cards.AddRange(deck.Draw(numToDraw));
+            var newCards = deck.Draw(numToDraw);
+            Hand.Cards.AddRange(newCards);
             Draws.Add(new DrawHistory(handBefore, numToDraw, Hand));
 
             return numToDraw;
@@ -63,17 +65,33 @@ namespace DrawPoker5.Entities
         {
             Id = Guid.NewGuid();
             Hand = new Hand();
-            Bets = new List<ActionHistory>();
+            Actions = new List<ActionHistory>();
             Draws = new List<DrawHistory>();
             Name = String.Empty;
             IsActive = true;
         }
+
+        //public Player(Guid id)
+        //{
+        //    Id = id;
+        //    Hand = new Hand();
+        //    Actions = ReadActions();
+        //    Draws = ReadDraws();
+        //    Name = String.Empty;
+        //    IsActive = true;
+        //}
 
         public Player(string name, int stake = 500) : this()
         {
             Name = name;
             Bank = stake;
         }
+
+        //public Player(Guid id, string name, int stake = 500) : this(id)
+        //{
+        //    Name = name;
+        //    Bank = stake;
+        //}
 
         public PlayerAction EvalBet(Guid roundId, int round, int position, int wager, int pot, int raiseCount, int playerCount)
         {
@@ -104,7 +122,7 @@ namespace DrawPoker5.Entities
                 Hand = Hand,
             };
 
-            var similarBets = Bets.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0)
+            var similarBets = Actions.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0)
                 .OrderByDescending(b => b.Score)
                 .ToList();
 
@@ -113,8 +131,8 @@ namespace DrawPoker5.Entities
             var bet = 0;
             if (similarBets.Count == 0)
             {
-                actionHistory.Play.Action = wager == 0 ? (Actions)random.Next(0, 3) : (Actions)random.Next(2, 5);
-                bet = actionHistory.Play.Action == Actions.Bet || actionHistory.Play.Action == Actions.Raise ? random.Next(1, 6) : 0;
+                actionHistory.Play.Action = wager == 0 ? (Action)random.Next(0, 3) : (Action)random.Next(2, 5);
+                bet = actionHistory.Play.Action == Action.Bet || actionHistory.Play.Action == Action.Raise ? random.Next(1, 6) : 0;
             }
             else
             {
@@ -125,22 +143,22 @@ namespace DrawPoker5.Entities
             // choose a bet if appropriate
             switch (actionHistory.Play.Action)  
             {
-                case Actions.Bet:
+                case Action.Bet:
                     actionHistory.Play.Bet = bet;
                     Stake += bet;
                     Bank -= bet;
                     break;
-                case Actions.Call:
+                case Action.Call:
                     actionHistory.Play.Bet = wager;
                     Stake += wager;
                     Bank -= wager;
                     break;
-                case Actions.Raise:
+                case Action.Raise:
                     actionHistory.Play.Bet = bet;
                     Stake += wager + bet;
                     Bank -= wager + bet;
                     break;
-                case Actions.Fold:
+                case Action.Fold:
                     actionHistory.Play.Bet = 0;
                     IsActive = false;
                     break;
@@ -151,8 +169,49 @@ namespace DrawPoker5.Entities
 
             actionHistory.Stake = Stake;
             actionHistory.Bank = Bank;
-            Bets.Add(actionHistory);
+            Actions.Add(actionHistory);
             return actionHistory.Play;
         }
+
+        //public void WriteAll()
+        //{
+        //    WriteActions();
+        //    WriteDraws();
+        //}
+
+        //public void WriteActions()
+        //{
+        //    string jsonString = JsonSerializer.Serialize(Actions);
+            
+        //    File.WriteAllText(fileName("actions"), jsonString);
+        //}
+
+        //public List<ActionHistory> ReadActions()
+        //{
+        //    List<ActionHistory> actionHistory = new();
+        //    if (File.Exists(fileName("actions")))
+        //    {
+        //        string jsonString = File.ReadAllText(fileName("actions"));
+        //        actionHistory = JsonSerializer.Deserialize<List<ActionHistory>>(jsonString)!;
+        //    }
+        //    return actionHistory;
+        //}
+
+        //public void WriteDraws()
+        //{
+        //    string jsonString = JsonSerializer.Serialize(Draws);
+        //    File.WriteAllText(fileName("draws"), jsonString);
+        //}
+
+        //public List<DrawHistory> ReadDraws()
+        //{
+        //    List<DrawHistory> drawHistory = new();
+        //    if (File.Exists(fileName("draws")))
+        //    {
+        //        string jsonString = File.ReadAllText(fileName("draws"));
+        //        drawHistory = JsonSerializer.Deserialize<List<DrawHistory>>(jsonString)!;
+        //    }
+        //    return drawHistory;
+        //}
     }
 }

@@ -49,22 +49,22 @@ namespace DrawPoker5.Entities
                     Console.WriteLine($"\t{ndx}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[ndx].Stake}\t{Players[ndx].Bank}\t{button}");
                     switch (play.Action)
                     {
-                        case Player.Actions.Bet:
+                        case Player.Action.Bet:
                             button = ndx;
                             Wager += play.Bet;
                             Pot += play.Bet;
                             break;
-                        case Player.Actions.Call:
+                        case Player.Action.Call:
                             Pot += play.Bet;
                             if (ndx+1 == button) bettingOpen = false;
                             break;
-                        case Player.Actions.Fold:
-                            var bets = Players[ndx].Bets.Where(b => b.RoundId == roundId).ToList();
+                        case Player.Action.Fold:
+                            var bets = Players[ndx].Actions.Where(b => b.RoundId == roundId).ToList();
                             bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
                             PlayerCount--;
                             if (ndx+1 == button) bettingOpen = false;
                             break;
-                        case Player.Actions.Raise:
+                        case Player.Action.Raise:
                             Pot += play.Bet + Wager;
                             Wager += play.Bet;
                             RaiseCount++;
@@ -97,7 +97,6 @@ namespace DrawPoker5.Entities
             Players.Where(p => p.IsActive).ToList().ForEach(p => p.Draw(Deck));
         }
 
-        //TODO add tests and fix logic - this isn't complete
         public Player Winner()
         {
             var orderedRanks = Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList();

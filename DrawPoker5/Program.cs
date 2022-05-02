@@ -1,7 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using DrawPoker5.Entities;
+using System.Text.Json;
 
 static void PrintBetHeader() => Console.WriteLine($"\tindex\twager\tpot\traises\tplayers\taction\tbet\tstake\tbank\tbtn");
+Directory.CreateDirectory("data");
 var game = new GamePlay();
 
 // Ante
@@ -38,6 +40,7 @@ game.Players.Where(p => p.IsActive).OrderByDescending(p => p.Hand.Rank).ToList()
     p.PrintHand();
 });
 
+game.Players.ForEach(p => File.WriteAllText(p.FileName, JsonSerializer.Serialize(p)));
 Console.WriteLine($"---- WINNER is # {game.Winner().Name} ----");
 
 //TODO record scores
