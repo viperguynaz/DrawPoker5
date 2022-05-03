@@ -84,7 +84,6 @@ namespace DrawPoker5.Entities
 
         public Player(string name, int stake = 500) : this()
         {
-            Id = Guid.NewGuid();
             Name = name;
             Bank = stake;
             IsActive = true;
