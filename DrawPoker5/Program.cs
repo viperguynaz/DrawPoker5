@@ -4,7 +4,7 @@ using System.Text.Json;
 
 static void PrintBetHeader() => Console.WriteLine($"\tindex\twager\tpot\traises\tplayers\taction\tbet\tstake\tbank\tbtn");
 Directory.CreateDirectory("data");
-var game = new GamePlay();
+var game = new GamePlay(true);
 
 // Ante
 game.AnteUp();

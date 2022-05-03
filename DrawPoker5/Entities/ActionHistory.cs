@@ -9,7 +9,7 @@ namespace DrawPoker5.Entities
     public class ActionHistory
     {
         // INPUTS
-        public Guid RoundId { get; set; }
+        public Guid GameId { get; set; }
         public int Round { get; set; }
         public int Position { get; set; }
         public int Wager { get; set; }

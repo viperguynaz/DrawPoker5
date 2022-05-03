@@ -11,18 +11,20 @@ namespace DrawPoker5.Entities
     public class Player
     {
         public enum Action { Check, Bet, Fold, Call, Raise }
-        public Guid Id { get; }
-        public Guid RoundId { get; set; }
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public int Bank { get; set; }
         public int Wins { get; set; }
         public int Losses { get; set; }
-        public bool IsActive { get; set; }
-        [JsonIgnore] 
-        public Hand Hand { get; set; }
+
         public int Stake { get; set; }  // contribution to pot for each hand, i.e. risk
         public List<ActionHistory> Actions { get; set; }
         public List<DrawHistory> Draws { get; set; }
+
+        [JsonIgnore]
+        public bool IsActive { get; set; }
+        [JsonIgnore] 
+        public Hand Hand { get; set; }
         [JsonIgnore] 
         public string FileName => $"data/{Id}.json";
 
@@ -68,7 +70,6 @@ namespace DrawPoker5.Entities
             Actions = new List<ActionHistory>();
             Draws = new List<DrawHistory>();
             Name = String.Empty;
-            IsActive = true;
         }
 
         //public Player(Guid id)
@@ -83,8 +84,10 @@ namespace DrawPoker5.Entities
 
         public Player(string name, int stake = 500) : this()
         {
+            Id = Guid.NewGuid();
             Name = name;
             Bank = stake;
+            IsActive = true;
         }
 
         //public Player(Guid id, string name, int stake = 500) : this(id)
@@ -93,7 +96,7 @@ namespace DrawPoker5.Entities
         //    Bank = stake;
         //}
 
-        public PlayerAction EvalBet(Guid roundId, int round, int position, int wager, int pot, int raiseCount, int playerCount)
+        public PlayerAction EvalBet(Guid gameId, int round, int position, int wager, int pot, int raiseCount, int playerCount)
         {
             /**
              * Inputs
@@ -112,7 +115,7 @@ namespace DrawPoker5.Entities
 
             var actionHistory = new ActionHistory()
             {
-                RoundId = roundId,
+                GameId = gameId,
                 Round = round,
                 Position = position,
                 Wager = wager,

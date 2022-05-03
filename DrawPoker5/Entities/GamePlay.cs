@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace DrawPoker5.Entities
 {
     public class GamePlay
     {
+        public Guid Id { get; set; }
         public int Pot { get; set; }
         public int Wager { get; set; }
         public int PlayerCount { get; set; }
@@ -36,7 +38,6 @@ namespace DrawPoker5.Entities
 
         public int PlaceBets(int round, int button)
         {
-            var roundId = Guid.NewGuid();
             var bettingOpen = true;
             Wager = 0;
             var ndx = round == 1 ? 0 : button;
@@ -45,7 +46,7 @@ namespace DrawPoker5.Entities
             {
                 if (Players[ndx].IsActive)
                 {
-                    play = Players[ndx].EvalBet(roundId, round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
+                    play = Players[ndx].EvalBet(Id, round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
                     Console.WriteLine($"\t{ndx}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[ndx].Stake}\t{Players[ndx].Bank}\t{button}");
                     switch (play.Action)
                     {
@@ -59,7 +60,7 @@ namespace DrawPoker5.Entities
                             if (ndx+1 == button) bettingOpen = false;
                             break;
                         case Player.Action.Fold:
-                            var bets = Players[ndx].Actions.Where(b => b.RoundId == roundId).ToList();
+                            var bets = Players[ndx].Actions.Where(b => b.GameId == Id).ToList();
                             bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
                             PlayerCount--;
                             if (ndx+1 == button) bettingOpen = false;
@@ -123,6 +124,7 @@ namespace DrawPoker5.Entities
 
         public GamePlay()
         {
+            Id = Guid.NewGuid();
             Config = new GameConfig();
             Wager = 0;
             Pot = 0;
@@ -131,11 +133,32 @@ namespace DrawPoker5.Entities
             PlayerCount = Config.NumPlayers;
             Deck = new Deck(true);  // build and shuffle card deck
             Players = new List<Player>(Config.NumPlayers);
-            for (int i = 0; i < Config.NumPlayers; i++)
+
+        }
+
+        public GamePlay(bool readPlayers) : this()
+        {
+            if (readPlayers)
             {
-                // create player
-                Players.Add(new Player(i.ToString()));
+                List<string> fileEntries = Directory.GetFiles("data").ToList();
+                int i = 0;
+                fileEntries.ForEach(file =>
+                {
+                    var player = JsonSerializer.Deserialize<Player>(File.ReadAllText(file))!;
+                    player.Name = i.ToString();
+                    player.IsActive = true;
+                    Players.Add(player);
+                    i++;
+                });
             }
+            else
+            {
+                for (int i = 0; i < Config.NumPlayers; i++)
+                {
+                    // create player
+                    Players.Add(new Player(i.ToString()));
+                }
+            }            
         }
     }
 }
