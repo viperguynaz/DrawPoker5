@@ -36,17 +36,17 @@ namespace DrawPoker5.Entities
             }
         }
 
-        public int PlaceBets(int round, int button)
+        public int PlaceBets(int button)
         {
             var bettingOpen = true;
             Wager = 0;
-            var ndx = round == 1 ? 0 : button;
+            var ndx = Round == 1 ? 0 : button;
             PlayerAction play;
             while (bettingOpen)
             {
                 if (Players[ndx].IsActive)
                 {
-                    play = Players[ndx].EvalBet(Id, round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
+                    play = Players[ndx].EvalBet(Id, Round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
                     Console.WriteLine($"\t{ndx}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[ndx].Stake}\t{Players[ndx].Bank}\t{button}");
                     switch (play.Action)
                     {
@@ -129,6 +129,7 @@ namespace DrawPoker5.Entities
             Wager = 0;
             Pot = 0;
             RaiseCount = 0;
+            Round = 1;
 
             PlayerCount = Config.NumPlayers;
             Deck = new Deck(true);  // build and shuffle card deck

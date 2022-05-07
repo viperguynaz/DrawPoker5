@@ -17,8 +17,8 @@ game.Players.ForEach(p => p.PrintHand());
 // 1st betting round
 Console.WriteLine("----------- Bet 1st Round -----------");
 PrintBetHeader();
-var button = game.PlaceBets(1, game.Config.NumPlayers - 1);
-
+var button = game.PlaceBets(game.Config.NumPlayers - 1);
+game.Round++;
 
 // Draw
 Console.WriteLine("----------- Draw -----------");
@@ -31,7 +31,7 @@ game.Players.Where(p => p.IsActive).ToList().ForEach(p =>
 // 2nd betting round
 Console.WriteLine("----------- Bet 2nd Round -----------");
 PrintBetHeader();
-game.PlaceBets(2, button);
+game.PlaceBets(button);
 
 // Establish winner and print final hands
 Console.WriteLine("----------- Final Hands -----------");
