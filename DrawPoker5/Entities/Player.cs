@@ -32,7 +32,7 @@ namespace DrawPoker5.Entities
 
         public int Ante(int ante)
         {
-            Stake -= ante;
+            Stake += ante;
             return ante;
         }
 
@@ -124,9 +124,14 @@ namespace DrawPoker5.Entities
                 Hand = Hand,
             };
 
-            var similarBets = Actions.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0)
-                .OrderByDescending(b => b.Score)
-                .ToList();
+            //TODO fix: check that bet actions are valid
+            List<ActionHistory> similarBets = wager > 0 ? 
+                Actions.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0 && b.Play.Action != Action.Check)
+                    .OrderByDescending(b => b.Score)
+                    .ToList() :
+                Actions.Where(b => b.Hand.Rank == Hand.Rank && b.Score > 0)
+                    .OrderByDescending(b => b.Score)
+                    .ToList();
 
             // choose an action
             //TODO need a more robust evaluation function to select action

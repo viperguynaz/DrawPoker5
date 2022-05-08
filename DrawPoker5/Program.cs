@@ -4,7 +4,7 @@ using System.Text.Json;
 
 static void PrintBetHeader() => Console.WriteLine($"\tindex\twager\tpot\traises\tplayers\taction\tbet\tstake\tbank\tbtn");
 Directory.CreateDirectory("data");
-var game = new GamePlay(true);
+var game = new GamePlay(false);
 
 // Ante
 game.AnteUp();
@@ -18,20 +18,23 @@ game.Players.ForEach(p => p.PrintHand());
 Console.WriteLine("----------- Bet 1st Round -----------");
 PrintBetHeader();
 var button = game.PlaceBets(game.Config.NumPlayers - 1);
-game.Round++;
-
-// Draw
-Console.WriteLine("----------- Draw -----------");
-game.Draw();
-game.Players.Where(p => p.IsActive).ToList().ForEach(p => 
+if (game.PlayerCount > 1)
 {
-    p.PrintHand();
-});
+    // Draw
+    Console.WriteLine("----------- Draw -----------");
+    game.Draw();
+    game.Players.Where(p => p.IsActive).ToList().ForEach(p =>
+    {
+        p.PrintHand();
+    });
 
-// 2nd betting round
-Console.WriteLine("----------- Bet 2nd Round -----------");
-PrintBetHeader();
-game.PlaceBets(button);
+    // 2nd betting round
+    //TODO - fix button/check - btn opens bet and checks, betting ends - not correct
+    Console.WriteLine("----------- Bet 2nd Round -----------");
+    PrintBetHeader();
+    game.Round++;
+    game.PlaceBets(button);
+}
 
 // Establish winner and print final hands
 Console.WriteLine("----------- Final Hands -----------");

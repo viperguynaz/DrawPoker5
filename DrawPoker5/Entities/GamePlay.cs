@@ -40,7 +40,27 @@ namespace DrawPoker5.Entities
         {
             var bettingOpen = true;
             Wager = 0;
-            var ndx = Round == 1 ? 0 : button;
+            var ndx = 0;
+            if (Round == 1)
+            {
+                ndx = 0;
+            }
+            else
+            {
+                ndx = button;
+                // reset button
+                var set = false;
+                var btnidx = ndx == 0 ? Config.NumPlayers : ndx - 1;
+                while (!set)
+                {
+                    if (Players[btnidx].IsActive)
+                    {
+                        button = btnidx;
+                        set = true;
+                    }
+                    btnidx--;
+                }
+            }
             PlayerAction play;
             while (bettingOpen)
             {
@@ -60,10 +80,11 @@ namespace DrawPoker5.Entities
                             if (ndx+1 == button) bettingOpen = false;
                             break;
                         case Player.Action.Fold:
-                            var bets = Players[ndx].Actions.Where(b => b.GameId == Id).ToList();
-                            bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
+                            //TODO - move this to scoring functions
+                            //var bets = Players[ndx].Actions.Where(b => b.GameId == Id).ToList();
+                            //bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
                             PlayerCount--;
-                            if (ndx+1 == button) bettingOpen = false;
+                            if (ndx+1 == button || PlayerCount == 1) bettingOpen = false;
                             break;
                         case Player.Action.Raise:
                             Pot += play.Bet + Wager;
