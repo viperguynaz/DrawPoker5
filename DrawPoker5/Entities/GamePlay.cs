@@ -48,9 +48,9 @@ namespace DrawPoker5.Entities
             else
             {
                 ndx = button;
-                // reset button
+                // reset button to player prior to button entering the round
                 var set = false;
-                var btnidx = ndx == 0 ? Config.NumPlayers : ndx - 1;
+                var btnidx = ndx == 0 ? Config.NumPlayers-1 : ndx - 1;
                 while (!set)
                 {
                     if (Players[btnidx].IsActive)
@@ -61,7 +61,9 @@ namespace DrawPoker5.Entities
                     btnidx--;
                 }
             }
+
             PlayerAction play;
+
             while (bettingOpen)
             {
                 if (Players[ndx].IsActive)
@@ -97,6 +99,7 @@ namespace DrawPoker5.Entities
                     }
                 }
 
+                //TODO - fix 2nd round logic where 1st player checks
                 ndx++;
                 if (ndx == Config.NumPlayers)
                 {
