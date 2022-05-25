@@ -36,85 +36,71 @@ namespace DrawPoker5.Entities
             }
         }
 
-        public int PlaceBets(int button)
+
+        // button should = last player to bet, controls the bet
+        public int PlaceBets(int last2Bet)
         {
             var bettingOpen = true;
             Wager = 0;
-            var ndx = 0;
-            if (Round == 1)
-            {
-                ndx = 0;
-            }
-            else
-            {
-                ndx = button;
-                // reset button to player prior to button entering the round
-                var set = false;
-                var btnidx = ndx == 0 ? Config.NumPlayers-1 : ndx - 1;
-                while (!set)
-                {
-                    if (Players[btnidx].IsActive)
-                    {
-                        button = btnidx;
-                        set = true;
-                    }
-                    btnidx--;
-                }
-            }
-
+            var player = Round == 1 ? 0 : last2Bet;
+            var openingPlayer = player;
             PlayerAction play;
 
             while (bettingOpen)
             {
-                if (Players[ndx].IsActive)
+                var nextPlayer = NextActivePlayer(player);
+                play = Players[player].EvalBet(Id, Round, last2Bet - player, Wager, Pot, RaiseCount, PlayerCount);
+                Console.WriteLine($"\t{player}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[player].Stake}\t{Players[player].Bank}\t{last2Bet}");
+                switch (play.Action)
                 {
-                    play = Players[ndx].EvalBet(Id, Round, button - ndx, Wager, Pot, RaiseCount, PlayerCount);
-                    Console.WriteLine($"\t{ndx}\t{Wager}\t{Pot}\t{RaiseCount}\t{PlayerCount}\t{play.Action}\t{play.Bet}\t{Players[ndx].Stake}\t{Players[ndx].Bank}\t{button}");
-                    switch (play.Action)
-                    {
-                        case Player.Action.Bet:
-                            button = ndx;
-                            Wager += play.Bet;
-                            Pot += play.Bet;
-                            break;
-                        case Player.Action.Call:
-                            Pot += play.Bet;
-                            if (ndx+1 == button) bettingOpen = false;
-                            break;
-                        case Player.Action.Fold:
-                            //TODO - move this to scoring functions
-                            //var bets = Players[ndx].Actions.Where(b => b.GameId == Id).ToList();
-                            //bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
-                            PlayerCount--;
-                            if (ndx+1 == button || PlayerCount == 1) bettingOpen = false;
-                            break;
-                        case Player.Action.Raise:
-                            Pot += play.Bet + Wager;
-                            Wager += play.Bet;
-                            RaiseCount++;
-                            button = ndx;
-                            break;
-                        default:
-                            break;
-                    }
+                    case Player.Action.Bet:
+                        last2Bet = player;
+                        Wager += play.Bet;
+                        Pot += play.Bet;
+                        break;
+                    case Player.Action.Call:
+                        Pot += play.Bet;
+                        if (nextPlayer == last2Bet) bettingOpen = false;
+                        break;
+                    case Player.Action.Fold:
+                        //TODO - move this to scoring functions
+                        //var bets = Players[ndx].Actions.Where(b => b.GameId == Id).ToList();
+                        //bets.ForEach(bet => bet.Score = -Players[ndx].Stake);
+                        PlayerCount--;
+                        if (nextPlayer == last2Bet || PlayerCount == 1) bettingOpen = false;
+                        break;
+                    case Player.Action.Raise:
+                        Pot += play.Bet + Wager;
+                        Wager += play.Bet;
+                        RaiseCount++;
+                        last2Bet = player;
+                        break;
+                    default:  // Player.Action.Check
+                        if (nextPlayer == openingPlayer && Wager == 0) bettingOpen = false;
+                        break;
                 }
 
-                //TODO - fix 2nd round logic where 1st player checks
-                ndx++;
-                if (ndx == Config.NumPlayers)
+                if (PlayerCount > 1)
                 {
-                    // loop back to start
-                    ndx = 0;
-                    // no bets - close round
-                    if (Wager == 0) bettingOpen = false;
+                    player = nextPlayer;
                 }
-                else if (ndx == button)
+                else
                 {
-                    // if we've reached the button we are done
                     bettingOpen = false;
                 }
             }
-            return button;
+            return last2Bet;
+        }
+
+        public int NextPlayer(int player) => player + 1 == Config.NumPlayers ? 0 : player + 1;
+        public int NextActivePlayer(int player)
+        {
+            var next = NextPlayer(player);
+            while (!Players[next].IsActive)
+            {
+                next = NextPlayer(next);
+            }
+            return next;
         }
 
         public void Draw()

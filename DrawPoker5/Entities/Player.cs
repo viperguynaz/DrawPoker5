@@ -169,7 +169,7 @@ namespace DrawPoker5.Entities
                     actionHistory.Play.Bet = 0;
                     IsActive = false;
                     break;
-                default:
+                default:  // Action.Chack
                     actionHistory.Play.Bet = 0;
                     break;
             }
